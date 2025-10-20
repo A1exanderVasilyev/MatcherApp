@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -63,10 +65,13 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserPhoto> photos = new ArrayList<>();
+
     public User() {
     }
 
-    public User(String username, String password, LocalDate dateOfBirth, String gender, String email, String country, String city, String role) {
+    public User(String username, String password, LocalDate dateOfBirth, String gender, String email, String country, String city, Double latitude, Double longitude, String role) {
         this.username = username;
         this.password = password;
         this.dateOfBirth = dateOfBirth;
@@ -74,6 +79,8 @@ public class User {
         this.email = email;
         this.country = country;
         this.city = city;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.role = role;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
@@ -96,6 +103,10 @@ public class User {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
+    }
+
+    public void addPhoto(UserPhoto userPhoto) {
+        photos.add(userPhoto);
     }
 
     public UUID getId() {
@@ -200,5 +211,13 @@ public class User {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<UserPhoto> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<UserPhoto> photos) {
+        this.photos = photos;
     }
 }
