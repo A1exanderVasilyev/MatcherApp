@@ -1,9 +1,11 @@
 package ru.vasilyev.MatcherApp.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.vasilyev.MatcherApp.enums.Gender;
+import ru.vasilyev.MatcherApp.enums.UserRole;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,51 +15,59 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
+@Data
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
-    @NotEmpty
-    @Size(min = 2, max = 100, message = "name should be between 2 and 100 characters")
-    @Column(name = "username")
+    @NotBlank(message = "Username is required")
+    @Size(min = 2, max = 100, message = "Username should be between 2 and 100 characters")
+    @Column(name = "username", unique = true)
     private String username;
 
-    @NotEmpty
+    @NotBlank(message = "Password is required")
     @Column(name = "password")
     private String password;
 
-    @NotEmpty
+    @NotNull(message = "Date of birth is required")
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @NotEmpty
+    @NotNull(message = "Gender is required")
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender")
-    private String gender;
+    private Gender gender;
 
-    @NotEmpty
-    @Email
-    @Column(name = "email")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
+    @Column(name = "email", unique = true)
     private String email;
 
-    @NotEmpty
+    @NotBlank(message = "Country is required")
     @Column(name = "country")
     private String country;
 
-    @NotEmpty
+    @NotBlank(message = "City is required")
     @Column(name = "city")
     private String city;
 
-    @NotEmpty
+    @NotNull(message = "Latitude is required")
+    @DecimalMin(value = "-90.0", message = "Latitude must be >= -90")
+    @DecimalMax(value = "90.0", message = "Latitude must be <= 90")
     @Column(name = "latitude")
     private Double latitude;
 
-    @NotEmpty
+    @NotNull(message = "Longitude is required")
+    @DecimalMin(value = "-180.0", message = "Longitude must be >= -180")
+    @DecimalMax(value = "180.0", message = "Longitude must be <= 180")
     @Column(name = "longitude")
     private Double longitude;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private String role;
+    private UserRole role;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -68,10 +78,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserPhoto> photos = new ArrayList<>();
 
-    public User() {
-    }
-
-    public User(String username, String password, LocalDate dateOfBirth, String gender, String email, String country, String city, Double latitude, Double longitude, String role) {
+    public User(String username, String password, LocalDate dateOfBirth, Gender gender, String email, String country, String city, Double latitude, Double longitude) {
         this.username = username;
         this.password = password;
         this.dateOfBirth = dateOfBirth;
@@ -81,143 +88,13 @@ public class User {
         this.city = city;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.role = role;
+        this.role = UserRole.USER;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", gender='" + gender + '\'' +
-                ", email='" + email + '\'' +
-                ", country='" + country + '\'' +
-                ", city='" + city + '\'' +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", role='" + role + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
-
     public void addPhoto(UserPhoto userPhoto) {
         photos.add(userPhoto);
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<UserPhoto> getPhotos() {
-        return photos;
-    }
-
-    public void setPhotos(List<UserPhoto> photos) {
-        this.photos = photos;
+        userPhoto.setUser(this);
     }
 }
