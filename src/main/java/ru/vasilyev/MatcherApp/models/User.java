@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -20,11 +19,11 @@ import java.util.UUID;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    private long id;
 
     @NotBlank(message = "Username is required")
     @Size(min = 2, max = 100, message = "Username should be between 2 and 100 characters")
-    @Column(name = "username", unique = true)
+    @Column(name = "username")
     private String username;
 
     @NotBlank(message = "Password is required")
@@ -53,15 +52,11 @@ public class User {
     @Column(name = "city")
     private String city;
 
-    @NotNull(message = "Latitude is required")
-    @DecimalMin(value = "-90.0", message = "Latitude must be >= -90")
-    @DecimalMax(value = "90.0", message = "Latitude must be <= 90")
+
     @Column(name = "latitude")
     private Double latitude;
 
-    @NotNull(message = "Longitude is required")
-    @DecimalMin(value = "-180.0", message = "Longitude must be >= -180")
-    @DecimalMax(value = "180.0", message = "Longitude must be <= 180")
+
     @Column(name = "longitude")
     private Double longitude;
 

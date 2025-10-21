@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "users_photo")
@@ -15,7 +14,7 @@ import java.util.UUID;
 public class UserPhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    private long id;
 
     @NotBlank(message = "Photo is required")
     @Column(name = "photo_url")
