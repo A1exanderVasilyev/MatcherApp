@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - MatchApp</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-header">
+        <h1>Создать аккаунт</h1>
+    </div>
+
+    <div th:if="${success}" class="success-message" th:text="${success}"></div>
+
+    <form method="post" th:action="@{/auth/registration}" th:object="${user}">
+        <div th:if="${#fields.hasErrors('*')}" class="alert alert-error">
+            Пожалуйста, исправьте ошибки в форме
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="username">Имя пользователя *</label>
+            <input type="text" id="username" th:field="*{username}" class="form-control"
+                   placeholder="Ваше имя">
+            <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="email">Email *</label>
+            <input type="email" id="email" th:field="*{email}" class="form-control"
+                   placeholder="your@email.com">
+            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="password">Пароль *</label>
+            <input type="password" id="password" th:field="*{password}" class="form-control"
+                   placeholder="Не менее 6 символов">
+            <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="dateOfBirth">Дата рождения *</label>
+            <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}" class="form-control">
+            <span th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}" class="error-message"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="gender">Пол *</label>
+            <select id="gender" th:field="*{gender}" class="form-control">
+                <option value="">Выберите пол</option>
+                <option th:each="gender : ${genders}"
+                        th:value="${gender}"
+                        th:text="${gender.name()}">
+                </option>
+            </select>
+            <span th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}" class="error-message"></span>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="country">Страна *</label>
+                <input type="text" id="country" th:field="*{country}" class="form-control"
+                       placeholder="Страна проживания">
+                <span th:if="${#fields.hasErrors('country')}" th:errors="*{country}" class="error-message"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="city">Город *</label>
+                <input type="text" id="city" th:field="*{city}" class="form-control"
+                       placeholder="Город проживания">
+                <span th:if="${#fields.hasErrors('city')}" th:errors="*{city}" class="error-message"></span>
+            </div>
+        </div>
+
+        <button type="submit" class="btn">Зарегистрироваться</button>
+    </form>
+
+    <div class="auth-switch">
+        Уже есть аккаунт? <a th:href="@{/auth/login}">Войдите</a>
+    </div>
+</div>
+</body>
+</html>
