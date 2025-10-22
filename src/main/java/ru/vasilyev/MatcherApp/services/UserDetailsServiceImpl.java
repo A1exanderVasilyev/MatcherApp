@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findUserByEmail(email);
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             throw new UsernameNotFoundException("Bad credentials");
         }
         return new UserDetailsImpl(user.get());
