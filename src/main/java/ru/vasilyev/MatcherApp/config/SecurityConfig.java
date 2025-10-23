@@ -17,11 +17,20 @@ public class SecurityConfig {
         return http
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/auth/**")
-//                        .permitAll()
+                        .requestMatchers("/", "/auth/**", "/css/**")
+                        .permitAll()
                         .anyRequest()
+                        .authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/auth/login")
+                        .loginProcessingUrl("/process_login")
+                        .usernameParameter("email")
+                        .defaultSuccessUrl("/hello", true)
+                        .failureUrl("/auth/login?error=true")
                         .permitAll()
                 )
+
                 .build();
     }
 
