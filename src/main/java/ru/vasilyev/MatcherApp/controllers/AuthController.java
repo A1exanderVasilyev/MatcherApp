@@ -5,15 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import ru.vasilyev.MatcherApp.enums.Gender;
 import ru.vasilyev.MatcherApp.models.User;
 import ru.vasilyev.MatcherApp.services.RegistrationService;
+
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/auth")
@@ -36,28 +33,25 @@ public class AuthController {
     public String processRegistration(@ModelAttribute("user") @Valid User user,
                                       BindingResult bindingResult,
                                       Model model) {
-        for (ObjectError error : bindingResult.getAllErrors()) {
-            if (error instanceof FieldError) {
-                FieldError fieldError = (FieldError) error;
-                System.out.println("Ошибка поля:");
-                System.out.println("  Поле: " + fieldError.getField());
-                System.out.println("  Отклоненное значение: '" + fieldError.getRejectedValue() + "'");
-                System.out.println("  Сообщение: " + fieldError.getDefaultMessage());
-                System.out.println("  Код ошибки: " + fieldError.getCode());
-            } else {
-                System.out.println("Общая ошибка объекта:");
-                System.out.println("  Объект: " + error.getObjectName());
-                System.out.println("  Сообщение: " + error.getDefaultMessage());
-                System.out.println("  Код ошибки: " + error.getCode());
-            }
-            System.out.println("------------------------------------");
-        }
         if (bindingResult.hasErrors()) {
             model.addAttribute("genders", Gender.values());
             return "auth/registration";
         }
+        user.setRole("ROLE_USER");
+        LocalDateTime currentDate = LocalDateTime.now();
+        user.setCreatedAt(currentDate);
+        user.setUpdatedAt(currentDate);
         registrationService.register(user);
         return "redirect:/auth/login";
     }
 
+    @GetMapping("/login")
+    public String loginPage(Model model,
+                            @RequestParam(value = "error", required = false) String error) {
+        if (error != null) {
+            model.addAttribute("error", "Неверный email или пароль");
+        }
+
+        return "auth/login";
+    }
 }
