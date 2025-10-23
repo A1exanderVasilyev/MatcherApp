@@ -1,11 +1,13 @@
 package ru.vasilyev.MatcherApp.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.vasilyev.MatcherApp.enums.Gender;
-import ru.vasilyev.MatcherApp.enums.UserRole;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -60,9 +62,8 @@ public class User {
     @Column(name = "longitude")
     private Double longitude;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private UserRole role;
+    private String role;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -83,7 +84,7 @@ public class User {
         this.city = city;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.role = UserRole.USER;
+        this.role = "ROLE_USER";
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
