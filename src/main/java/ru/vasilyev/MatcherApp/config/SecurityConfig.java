@@ -26,7 +26,7 @@ public class SecurityConfig {
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/process_login")
                         .usernameParameter("email")
-                        .defaultSuccessUrl("/hello", true)
+                        .defaultSuccessUrl("/photos", true)
                         .failureUrl("/auth/login?error=true")
                         .permitAll()
                 )
