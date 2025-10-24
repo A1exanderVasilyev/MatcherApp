@@ -1,12 +1,9 @@
 package ru.vasilyev.MatcherApp.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.vasilyev.MatcherApp.dto.UserRegistrationDTO;
 import ru.vasilyev.MatcherApp.enums.Gender;
 
 import java.time.LocalDate;
@@ -23,41 +20,30 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank(message = "Username is required")
-    @Size(min = 2, max = 100, message = "Username should be between 2 and 100 characters")
     @Column(name = "username")
     private String username;
 
-    @NotBlank(message = "Password is required")
     @Column(name = "password")
     private String password;
 
-    @NotNull(message = "Date of birth is required")
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @NotNull(message = "Gender is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private Gender gender;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
     @Column(name = "email", unique = true)
     private String email;
 
-    @NotBlank(message = "Country is required")
     @Column(name = "country")
     private String country;
 
-    @NotBlank(message = "City is required")
     @Column(name = "city")
     private String city;
 
-
     @Column(name = "latitude")
     private Double latitude;
-
 
     @Column(name = "longitude")
     private Double longitude;
@@ -87,6 +73,20 @@ public class User {
         this.role = "ROLE_USER";
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public User(UserRegistrationDTO userRegistrationDTO) {
+        this.username = userRegistrationDTO.getUsername();
+        this.password = userRegistrationDTO.getPassword();
+        this.dateOfBirth = userRegistrationDTO.getDateOfBirth();
+        this.gender = userRegistrationDTO.getGender();
+        this.email = userRegistrationDTO.getEmail();
+        this.country = userRegistrationDTO.getCountry();
+        this.city = userRegistrationDTO.getCity();
+        this.role = "ROLE_USER";
+        LocalDateTime creationTime = LocalDateTime.now();
+        this.createdAt = creationTime;
+        this.updatedAt = creationTime;
     }
 
     public void addPhoto(UserPhoto userPhoto) {

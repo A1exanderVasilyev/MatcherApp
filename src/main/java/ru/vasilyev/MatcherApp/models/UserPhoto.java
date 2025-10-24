@@ -1,7 +1,6 @@
 package ru.vasilyev.MatcherApp.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,9 +15,14 @@ public class UserPhoto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank(message = "Photo is required")
     @Column(name = "photo_url")
     private String photoUrl;
+
+    @Column(name = "file_name")
+    private String fileName;
+
+    @Column(name = "file_size")
+    private Long fileSize;
 
     @Column(name = "uploaded_at")
     private LocalDateTime uploadedAt;
@@ -30,9 +34,11 @@ public class UserPhoto {
     @Column(name = "is_primary")
     private Boolean isPrimary = false;
 
-    public UserPhoto(String photoUrl, LocalDateTime uploadedAt, User user, Boolean isPrimary) {
+    public UserPhoto(String photoUrl, String fileName, Long fileSize, User user, Boolean isPrimary) {
         this.photoUrl = photoUrl;
-        this.uploadedAt = uploadedAt;
+        this.fileName = fileName;
+        this.fileSize = fileSize;
+        this.uploadedAt = LocalDateTime.now();
         this.user = user;
         this.isPrimary = isPrimary;
     }
