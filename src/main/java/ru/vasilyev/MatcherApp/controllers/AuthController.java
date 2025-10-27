@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.vasilyev.MatcherApp.dto.UserRegistrationDTO;
 import ru.vasilyev.MatcherApp.enums.Gender;
 import ru.vasilyev.MatcherApp.services.RegistrationService;
@@ -33,7 +34,8 @@ public class AuthController {
     @PostMapping(value = "/registration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String processRegistration(@ModelAttribute("user") @Valid UserRegistrationDTO userRegistrationDTO,
                                       BindingResult bindingResult,
-                                      Model model) {
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
         if (!userRegistrationDTO.hasProfilePhoto()) {
             bindingResult.rejectValue("profilePhoto", "error.user", "Выберите фото профиля");
         } else {
@@ -47,7 +49,7 @@ public class AuthController {
 
         try {
             registrationService.register(userRegistrationDTO);
-            model.addAttribute("success", "Регистрация прошла успешно! Теперь вы можете войти.");
+            redirectAttributes.addFlashAttribute("success", "Регистрация прошла успешно! Теперь вы можете войти.");
             return "redirect:/auth/login";
         } catch (UserExistsException e) {
             bindingResult.rejectValue("email", "error.user", "Email уже занят");
