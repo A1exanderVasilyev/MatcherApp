@@ -35,7 +35,16 @@ public class UserRegistrationDTO {
 
     private MultipartFile profilePhoto;
 
+    private Double longitude;
+    private Double latitude;
+
     public boolean hasProfilePhoto() {
         return profilePhoto != null && !profilePhoto.isEmpty();
+    }
+
+    public boolean isGeolocationValid() {
+        return longitude != null && latitude != null &&
+                latitude >= -90 && latitude <= 90 &&
+                longitude >= -180 && longitude <= 180;
     }
 }
