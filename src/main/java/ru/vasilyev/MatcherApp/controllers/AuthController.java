@@ -36,6 +36,7 @@ public class AuthController {
                                       BindingResult bindingResult,
                                       Model model,
                                       RedirectAttributes redirectAttributes) {
+        System.out.println(userRegistrationDTO);
         if (!userRegistrationDTO.hasProfilePhoto()) {
             bindingResult.rejectValue("profilePhoto", "error.user", "Выберите фото профиля");
         } else {
