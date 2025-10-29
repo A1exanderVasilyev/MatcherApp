@@ -83,6 +83,8 @@ public class User {
         this.email = userRegistrationDTO.getEmail();
         this.country = userRegistrationDTO.getCountry();
         this.city = userRegistrationDTO.getCity();
+        this.longitude = userRegistrationDTO.getLongitude();
+        this.latitude = userRegistrationDTO.getLatitude();
         this.role = "ROLE_USER";
         LocalDateTime creationTime = LocalDateTime.now();
         this.createdAt = creationTime;
