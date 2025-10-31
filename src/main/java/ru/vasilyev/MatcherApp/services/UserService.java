@@ -1,8 +1,13 @@
 package ru.vasilyev.MatcherApp.services;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import ru.vasilyev.MatcherApp.dto.UserUpdateDTO;
 import ru.vasilyev.MatcherApp.models.User;
 import ru.vasilyev.MatcherApp.repositoies.UserRepository;
+import ru.vasilyev.MatcherApp.util.exceptions.UserExistsException;
+
+import java.time.LocalDateTime;
 
 @Service
 public class UserService {
@@ -18,5 +23,24 @@ public class UserService {
 
     public User findByEmail(String email) {
         return userRepository.findUserByEmail(email).orElseThrow();
+    }
+
+    @Transactional
+    public void updateUser(Long userId, UserUpdateDTO userUpdateDTO) throws UserExistsException {
+        User user = findById(userId);
+        String dtoEmail = userUpdateDTO.getEmail();
+        if (!user.getEmail().equals(dtoEmail) && userRepository.existsByEmail(dtoEmail)) {
+            throw new UserExistsException("Email " + userUpdateDTO.getEmail() + " уже используется");
+        }
+        user.setUsername(userUpdateDTO.getUsername());
+        user.setEmail(dtoEmail);
+        user.setDateOfBirth(userUpdateDTO.getDateOfBirth());
+        user.setCountry(userUpdateDTO.getCountry());
+        user.setCity(userUpdateDTO.getCity());
+//        user.setLongitude(userUpdateDTO.getLongitude());
+//        user.setLatitude(userUpdateDTO.getLatitude());
+        user.setGender(userUpdateDTO.getGender());
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
     }
 }
