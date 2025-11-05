@@ -8,6 +8,7 @@ import ru.vasilyev.MatcherApp.repositoies.UserRepository;
 import ru.vasilyev.MatcherApp.util.exceptions.UserExistsException;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 @Service
 public class UserService {
@@ -26,7 +27,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Long userId, UserUpdateDTO userUpdateDTO) throws UserExistsException {
+    public User updateUser(Long userId, UserUpdateDTO userUpdateDTO) throws UserExistsException {
         User user = findById(userId);
         String dtoEmail = userUpdateDTO.getEmail();
         if (!user.getEmail().equals(dtoEmail) && userRepository.existsByEmail(dtoEmail)) {
@@ -41,6 +42,6 @@ public class UserService {
 //        user.setLatitude(userUpdateDTO.getLatitude());
         user.setGender(userUpdateDTO.getGender());
         user.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 }
