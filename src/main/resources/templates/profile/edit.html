@@ -147,7 +147,7 @@
     <div class="photos-grid">
         <div th:each="photo : ${userPhotos}" class="photo-card">
             <div th:if="${photo.isPrimary}" class="primary-badge">⭐ Главная</div>
-            <img th:src="@{/photos/{id}(id=${photo.id})}"
+            <img th:src="@{/profile/photos/{id}(id=${photo.id})}"
                  th:alt="${photo.fileName}"
                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">
 
@@ -162,11 +162,11 @@
             </div>
 
             <div class="actions">
-                <a th:href="@{/photos/{id}/primary(id=${photo.id})}"
+                <a th:href="@{/profile/photos/{id}/primary(id=${photo.id})}"
                    th:unless="${photo.isPrimary}"
                    class="btn btn-primary">Сделать главной</a>
 
-                <a th:href="@{/photos/{id}/delete(id=${photo.id})}"
+                <a th:href="@{/profile/photos/{id}/delete(id=${photo.id})}"
                    class="btn btn-danger"
                    onclick="return confirm('Удалить эту фотографию?')">Удалить</a>
             </div>
