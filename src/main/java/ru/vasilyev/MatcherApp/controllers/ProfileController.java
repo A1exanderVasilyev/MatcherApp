@@ -45,7 +45,6 @@ public class ProfileController {
 
             model.addAttribute("user", convertToUserUpdateDTO(user));
             model.addAttribute("userPhotos", userPhotos);
-            System.out.println(userPhotos);
 
         } catch (Exception e) {
             model.addAttribute("error", "Ошибка при загрузке фотографий");
