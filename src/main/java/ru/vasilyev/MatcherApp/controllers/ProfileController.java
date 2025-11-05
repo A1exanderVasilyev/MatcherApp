@@ -1,20 +1,24 @@
 package ru.vasilyev.MatcherApp.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import ru.vasilyev.MatcherApp.dto.UserUpdateDTO;
 import ru.vasilyev.MatcherApp.models.User;
 import ru.vasilyev.MatcherApp.models.UserPhoto;
+import ru.vasilyev.MatcherApp.services.UserDetailsServiceImpl;
 import ru.vasilyev.MatcherApp.services.UserPhotoService;
 import ru.vasilyev.MatcherApp.services.UserService;
 
@@ -28,10 +32,12 @@ import java.util.List;
 public class ProfileController {
     private final UserPhotoService userPhotoService;
     private final UserService userService;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
 
-    public ProfileController(UserPhotoService userPhotoService, UserService userService) {
+    public ProfileController(UserPhotoService userPhotoService, UserService userService, UserDetailsServiceImpl userDetailsServiceImpl) {
         this.userPhotoService = userPhotoService;
         this.userService = userService;
+        this.userDetailsServiceImpl = userDetailsServiceImpl;
     }
 
     @GetMapping()
@@ -47,11 +53,39 @@ public class ProfileController {
             model.addAttribute("userPhotos", userPhotos);
 
         } catch (Exception e) {
-            model.addAttribute("error", "Ошибка при загрузке фотографий");
+            model.addAttribute("error", "Ошибка при загрузке данных");
         }
         return "profile/edit";
     }
 
+    // TODO вынести изменение email в отдельную страницу связанную с авторизацией и тп
+    @PostMapping("/update")
+    public String updateUserProfile(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @ModelAttribute("user") @Valid UserUpdateDTO userUpdateDTO,
+            BindingResult bindingResult,
+            Model model,
+            HttpServletRequest request
+    ) {
+        try {
+            String oldEmail = userDetails.getUsername();
+            User user = userService.findByEmail(oldEmail);
+            List<UserPhoto> userPhotos = userPhotoService.getUserPhotos(user.getId());
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("userPhotos", userPhotos);
+                return "profile/edit";
+            }
+
+            User updatedUser = userService.updateUser(user.getId(), userUpdateDTO);
+            if (!oldEmail.equals(updatedUser.getEmail())) {
+                updateSecurityContext(updatedUser, request);
+            }
+
+            return "redirect:/profile?success";
+        } catch (Exception e) {
+            return "redirect:/profile?error";
+        }
+    }
 
     @GetMapping("/photos/{photoId}")
     @ResponseBody
@@ -85,5 +119,23 @@ public class ProfileController {
         userDTO.setCity(user.getCity());
 
         return userDTO;
+    }
+
+    private void updateSecurityContext(User updatedUser, HttpServletRequest request) {
+        UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(updatedUser.getEmail());
+
+        UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                userDetails.getPassword(),
+                userDetails.getAuthorities()
+        );
+
+        newAuth.setDetails(SecurityContextHolder.getContext().getAuthentication().getDetails());
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+        }
+
     }
 }
