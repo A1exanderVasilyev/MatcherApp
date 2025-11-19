@@ -1,6 +1,7 @@
 package ru.vasilyev.MatcherApp.services;
 
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.vasilyev.MatcherApp.dto.UserUpdateDTO;
 import ru.vasilyev.MatcherApp.models.User;
@@ -8,7 +9,6 @@ import ru.vasilyev.MatcherApp.repositoies.UserRepository;
 import ru.vasilyev.MatcherApp.util.exceptions.UserExistsException;
 
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 
 @Service
 public class UserService {
@@ -23,7 +23,8 @@ public class UserService {
     }
 
     public User findByEmail(String email) {
-        return userRepository.findUserByEmail(email).orElseThrow();
+        return userRepository.findUserByEmail(email).orElseThrow(() ->
+                new UsernameNotFoundException("Пользователь не найден"));
     }
 
     @Transactional

@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface UserPhotoRepository extends JpaRepository<UserPhoto, Long> {
     List<UserPhoto> findByUserIdOrderByUploadedAtDesc(long userId);
+
+    UserPhoto findByUserIdAndIsPrimaryTrue(long userId);
 }

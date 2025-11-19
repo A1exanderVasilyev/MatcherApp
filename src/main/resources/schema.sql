@@ -33,7 +33,9 @@ CREATE TABLE users_photo (
     CONSTRAINT fk_user_photo_user FOREIGN KEY (user_id) REFERENCES users(id)
         ON DELETE CASCADE,
 
-    UNIQUE(user_id, is_primary),
-
     CONSTRAINT chk_file_size CHECK (file_size <= 10485760)
 );
+
+CREATE UNIQUE INDEX users_photo_unique_primary
+    ON users_photo (user_id)
+    WHERE is_primary;

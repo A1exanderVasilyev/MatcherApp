@@ -3,6 +3,7 @@ package ru.vasilyev.MatcherApp.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -15,12 +16,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.vasilyev.MatcherApp.dto.UserUpdateDTO;
 import ru.vasilyev.MatcherApp.models.User;
 import ru.vasilyev.MatcherApp.models.UserPhoto;
 import ru.vasilyev.MatcherApp.services.UserDetailsServiceImpl;
 import ru.vasilyev.MatcherApp.services.UserPhotoService;
 import ru.vasilyev.MatcherApp.services.UserService;
+import ru.vasilyev.MatcherApp.util.constants.Constants;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +32,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Controller
+@Slf4j
 @RequestMapping("/profile")
 public class ProfileController {
     private final UserPhotoService userPhotoService;
@@ -107,6 +112,39 @@ public class ProfileController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/photos/upload")
+    public String uploadPhotos(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("photo") MultipartFile file,
+            @RequestParam(value = "isPrimary", defaultValue = "false") boolean isPrimary,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            User user = userService.findByEmail(userDetails.getUsername());
+            List<String> errors = userPhotoService.validatePhotoFile(file);
+            if (!errors.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errors", errors);
+                return "redirect:/profile";
+            }
+
+            int userPhotosCount = user.getPhotos().size();
+            if (userPhotosCount >= Constants.MAX_PHOTO_PER_USER_COUNT) {
+                redirectAttributes.addFlashAttribute("error", "Достигнут лимит фотографий (максимум " +
+                        Constants.MAX_PHOTO_PER_USER_COUNT + ")");
+                return "redirect:/profile";
+            }
+            UserPhoto uploadPhoto = userPhotoService.uploadPhoto(user.getId(), file, isPrimary);
+            String message = "Фотография успешно загружена";
+            redirectAttributes.addFlashAttribute("success", message);
+
+        } catch (Exception e) {
+            log.error("Ошибка загрузки фотографии для пользователя {}", userDetails.getUsername(), e);
+            redirectAttributes.addFlashAttribute("error", "Ошибка загрузки: " + e.getMessage());
+        }
+
+        return "redirect:/profile";
     }
 
     private UserUpdateDTO convertToUserUpdateDTO(User user) {
